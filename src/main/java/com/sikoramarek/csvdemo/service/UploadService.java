@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,9 +24,9 @@ import java.util.Map;
 @Service
 public class UploadService {
 
+	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 	private final int PHONE_NUMBER_LENGTH = 9;
 	private final int PHONE_NUMBER_ERROR_THRESHOLD = 1;
-	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 	private UserDataRepository usersDataRepository;
 
 	public UploadService(UserDataRepository usersDataRepository) {
@@ -35,9 +34,9 @@ public class UploadService {
 	}
 
 	/**
-	 *  Creates CsvMapper and tries to map key-value pairs
-	 *  sends map to parseData method on success
-	 *  or else returns NOT_ACCEPTABLE response
+	 * Creates CsvMapper and tries to map key-value pairs
+	 * sends map to parseData method on success
+	 * or else returns NOT_ACCEPTABLE response
 	 *
 	 * @param multipartFile - uploaded file
 	 * @return NOT_ACCEPTABLE response or UploadResponse
@@ -64,7 +63,7 @@ public class UploadService {
 	 *
 	 * @param data - MappingIterator holding all parsed data from csv file
 	 * @return uploadResponse entity wrapped by ResponseEntity class
-	 *          populated by either helper methods or this method
+	 * populated by either helper methods or this method
 	 */
 	private ResponseEntity<UploadResponse> parseData(MappingIterator<Map<String, String>> data) {
 		UploadResponse uploadResponse = new UploadResponse();
@@ -115,15 +114,15 @@ public class UploadService {
 	 * @param singleRowData  - Key-Value Map with single entry data
 	 * @param uploadResponse - uploadResponse entity created by parseData for status report
 	 * @return String Array of length 2, where first position is first name
-	 *          and second position last name
-	 *          Or updates uploadResponse and throws ParseError
+	 * and second position last name
+	 * Or updates uploadResponse and throws ParseError
 	 */
 	private String[] namesCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
 		int NAME_LENGTH_MIN = 2;
-		String firstName = singleRowData.getOrDefault("first_name", "");
-		String lastName = singleRowData.getOrDefault("last_name", "");
-		if (StringUtils.trimAllWhitespace(firstName).length() < NAME_LENGTH_MIN ||
-				StringUtils.trimAllWhitespace(lastName).length() < NAME_LENGTH_MIN) {
+		String firstName = singleRowData.getOrDefault("first_name", "").replaceAll("\\s", "");
+		String lastName = singleRowData.getOrDefault("last_name", "").replaceAll("\\s", "");
+		if (firstName.length() < NAME_LENGTH_MIN ||
+				lastName.length() < NAME_LENGTH_MIN) {
 			String error = "First name or last name error";
 			uploadResponse.addToFailedWithCause(singleRowData.toString(), error);
 			throw new ParseError(error);
@@ -137,11 +136,11 @@ public class UploadService {
 	 * @param singleRowData  - Key-Value Map with single entry data
 	 * @param uploadResponse - uploadResponse entity created by parseData for status report
 	 * @return String with correct phone number or null
-	 *          Or updates uploadResponse and throws ParseError
+	 * Or updates uploadResponse and throws ParseError
 	 */
 	private String phoneNoCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
 		String phoneNo = singleRowData.getOrDefault("phone_no", "0");
-		phoneNo = StringUtils.trimAllWhitespace(phoneNo);
+		phoneNo = phoneNo.replaceAll("\\s", "");
 		if (phoneNo.length() == PHONE_NUMBER_LENGTH) {
 			if (usersDataRepository.findByPhoneNoEquals(phoneNo) != null) {
 				String error = "Phone number already exists in database";
@@ -164,7 +163,7 @@ public class UploadService {
 	 * @param singleRowData  - Key-Value Map with single entry data
 	 * @param uploadResponse - uploadResponse entity created by parseData for status report
 	 * @return String containing formatted date
-	 *          Or updates uploadResponse and throws ParseError
+	 * Or updates uploadResponse and throws ParseError
 	 */
 	private String dateFormatCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
 		int YEAR_INDEX = 0;
@@ -175,8 +174,8 @@ public class UploadService {
 		int DATE_ELEMENTS = 3;
 
 		String birthday = singleRowData.getOrDefault("birth_date", "");
-		if (birthday != null && StringUtils.trimAllWhitespace(birthday).length() > BIRTHDAY_STRING_LENGTH_MIN) {
-			String[] date = StringUtils.trimAllWhitespace(birthday).split("\\.");
+		if (birthday != null && birthday.replaceAll("\\s", "").length() > BIRTHDAY_STRING_LENGTH_MIN) {
+			String[] date = birthday.replaceAll("\\s", "").split("\\.");
 			StringBuilder sb = new StringBuilder();
 			if (date.length == DATE_ELEMENTS && date[YEAR_INDEX].length() == YEAR_STRING_LENGTH) {
 				sb.append(date[YEAR_INDEX]);
@@ -191,7 +190,7 @@ public class UploadService {
 	}
 
 	private String checkAndAddMissingZero(String toCheck) {
-		if (toCheck.length() ==1){
+		if (toCheck.length() == 1) {
 			return "0" + toCheck;
 		}
 		return toCheck;
