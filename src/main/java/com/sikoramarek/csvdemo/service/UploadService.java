@@ -79,10 +79,14 @@ public class UploadService {
 			if (size == 4){
 				String phone_no = rowAsMap.get("phone_no");
 				if (phone_no.length() != 9 ){
-					logger.error("Phone number in wrong format");
-					return false;
+					logger.error("Phone number in wrong format" + rowAsMap);
+				} else {
+					if (usersDataRepository.findByPhoneNoEquals(phone_no) != null){
+						logger.error("User with this phone nr exists "+rowAsMap);
+						return false;
+					};
+					user.setPhoneNo(phone_no);
 				}
-				user.setPhone_no(phone_no);
 			}
 			usersDataRepository.save(user);
 		} catch (DateTimeParseException e) {

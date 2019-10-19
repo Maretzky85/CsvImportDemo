@@ -1,8 +1,6 @@
 package com.sikoramarek.csvdemo.controller;
 
 import com.sikoramarek.csvdemo.service.UploadService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +15,6 @@ public class UploadController {
 	}
 
 	private UploadService uploadService;
-
-	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
 	@PostMapping("upload")
 	public ResponseEntity upload(@RequestParam("file") MultipartFile multipartFile){

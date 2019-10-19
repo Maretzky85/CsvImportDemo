@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class UserDataService {
 
-	UsersDataRepository usersDataRepository;
+	private UsersDataRepository usersDataRepository;
 
 	public UserDataService(UsersDataRepository usersDataRepository){
 		this.usersDataRepository = usersDataRepository;
@@ -23,7 +23,7 @@ public class UserDataService {
 				.first_name("Stefan")
 				.last_name("Testowy")
 				.birthDate(LocalDate.parse("1988.11.11", DateTimeFormatter.ofPattern("yyyy.MM.dd")))
-				.phone_no("600700800")
+				.phoneNo("600700800")
 				.build();
 		UsersData user2 = UsersData.builder()
 				.first_name("Stefan")
