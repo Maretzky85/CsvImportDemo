@@ -10,14 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class UploadController {
 
-	public UploadController(UploadService uploadService){
+	private UploadService uploadService;
+
+	public UploadController(UploadService uploadService) {
 		this.uploadService = uploadService;
 	}
 
-	private UploadService uploadService;
-
 	@PostMapping("upload")
-	public ResponseEntity upload(@RequestParam("file") MultipartFile multipartFile){
+	public ResponseEntity upload(@RequestParam("file") MultipartFile multipartFile) {
 		return uploadService.parseFile(multipartFile);
 	}
 

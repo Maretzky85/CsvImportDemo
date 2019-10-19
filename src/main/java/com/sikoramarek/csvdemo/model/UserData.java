@@ -3,7 +3,6 @@ package com.sikoramarek.csvdemo.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
@@ -17,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Users_data")
-public class UsersData {
+public class UserData {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,11 +24,13 @@ public class UsersData {
 
 	@NotNull
 	@Length(max = 50)
-	String first_name;
+	@Column(name = "first_name")
+	String firstName;
 
 	@NotNull
 	@Length(max = 50)
-	String last_name;
+	@Column(name = "last_name")
+	String lastName;
 
 	@NotNull
 	@Column(name = "birth_date")
