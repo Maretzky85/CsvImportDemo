@@ -27,7 +27,9 @@ public class UploadResponse {
 		failed++;
 	}
 
-	public void addToFailedWithCouse(String key, String value) {
+	public void addToFailedWithCause(String key, String value) {
+		total++;
+		failed++;
 		failedList.put(key, value);
 	}
 
