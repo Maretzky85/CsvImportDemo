@@ -1,0 +1,1 @@
+INSERT INTO usersData (first_name, last_name, birth_date, phone_no) VALUES ( 'Stefan', 'Testowy', TO_DATE('1988.11.11', 'YYYY.MM.DD'), '600700800' )
