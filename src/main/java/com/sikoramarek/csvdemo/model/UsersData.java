@@ -1,7 +1,10 @@
 package com.sikoramarek.csvdemo.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.hibernate.annotations.Type;
+
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -10,6 +13,9 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsersData {
 
 	@Id
@@ -25,7 +31,8 @@ public class UsersData {
 	String last_name;
 
 	@NotNull
-	LocalDate birth_date;
+	@Column(name = "birth_date")
+	LocalDate birthDate;
 
 	@Column(length = 9)
 	@Length(min = 9, max = 9)

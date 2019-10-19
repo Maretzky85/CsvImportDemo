@@ -5,4 +5,6 @@ create table usersData
 	last_name varchar(50) not null,
 	birth_date date not null,
 	phone_no char(9)
+		constraint users_name_key
+			unique,
 );
