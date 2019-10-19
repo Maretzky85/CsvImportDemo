@@ -27,4 +27,14 @@ public class UserDataController {
 	public ResponseEntity<Page<UsersData>> getAllUsersSorted() {
 		return userDataService.getAllUsersSorted();
 	}
+
+	@GetMapping("count")
+	public ResponseEntity<Long> getCount() {
+		return userDataService.countUsers();
+	}
+
+	@GetMapping("getOldest")
+	public ResponseEntity<UsersData> getOldest() {
+		return userDataService.oldestUserWithPhoneNr();
+	}
 }

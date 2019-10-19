@@ -6,6 +6,7 @@ import lombok.Data;
 
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "Users_data")
 public class UsersData {
 
 	@Id
@@ -34,7 +36,6 @@ public class UsersData {
 	@Column(name = "birth_date")
 	LocalDate birthDate;
 
-	@Column(length = 9)
-	@Length(min = 9, max = 9)
+	@Column(length = 9, nullable = true)
 	String phone_no;
 }
