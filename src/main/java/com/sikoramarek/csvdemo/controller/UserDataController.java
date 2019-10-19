@@ -5,6 +5,7 @@ import com.sikoramarek.csvdemo.service.UserDataService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,5 +44,15 @@ public class UserDataController {
 	@GetMapping(value = "search", params = {"search"})
 	public ResponseEntity<List<UserData>> searchUserBySurname(@RequestParam("search") String search) {
 		return userDataService.searchBySurname(search);
+	}
+
+	@PostMapping
+	public ResponseEntity<String> deleteUserById(@RequestParam("id") Long _id) {
+		return userDataService.deleteById(_id);
+	}
+
+	@PostMapping
+	public ResponseEntity<String> deleteAllUsers() {
+		return userDataService.deleteAll();
 	}
 }

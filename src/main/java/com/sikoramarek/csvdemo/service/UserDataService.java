@@ -43,4 +43,22 @@ public class UserDataService {
 				new ResponseEntity<>(userData, HttpStatus.OK))
 				.orElseGet(() -> new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK));
 	}
+
+	public ResponseEntity<String> deleteById(Long _id) {
+		if (_id >= 0){
+			Optional<UserData> user = userDataRepository.findById(_id);
+			String userData;
+			if (user.isPresent()){
+				userData = user.get().toString();
+				userDataRepository.deleteById(_id);
+				return new ResponseEntity<>(userData, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	public ResponseEntity<String> deleteAll() {
+		userDataRepository.deleteAll();
+		return new ResponseEntity<>("Deleted All Entries", HttpStatus.OK);
+	}
 }
