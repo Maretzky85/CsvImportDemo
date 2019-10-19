@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserDataService {
@@ -44,21 +42,21 @@ public class UserDataService {
 				.orElseGet(() -> new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK));
 	}
 
-	public ResponseEntity<String> deleteById(Long _id) {
+	public ResponseEntity<Map> deleteById(Long _id) {
 		if (_id >= 0){
 			Optional<UserData> user = userDataRepository.findById(_id);
 			String userData;
 			if (user.isPresent()){
 				userData = user.get().toString();
 				userDataRepository.deleteById(_id);
-				return new ResponseEntity<>(userData, HttpStatus.OK);
+				return new ResponseEntity<>(Collections.singletonMap("Deleted", userData), HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	public ResponseEntity<String> deleteAll() {
+	public ResponseEntity<List> deleteAll() {
 		userDataRepository.deleteAll();
-		return new ResponseEntity<>("Deleted All Entries", HttpStatus.OK);
+		return new ResponseEntity<>(Collections.singletonList("Deleted All Entries"), HttpStatus.OK);
 	}
 }

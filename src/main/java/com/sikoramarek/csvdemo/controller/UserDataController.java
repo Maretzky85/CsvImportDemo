@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -36,7 +37,7 @@ public class UserDataController {
 		return userDataService.countUsers();
 	}
 
-	@GetMapping("getOldest")
+	@GetMapping("oldest")
 	public ResponseEntity<UserData> getOldest() {
 		return userDataService.oldestUserWithPhoneNr();
 	}
@@ -46,13 +47,13 @@ public class UserDataController {
 		return userDataService.searchBySurname(search);
 	}
 
-	@PostMapping
-	public ResponseEntity<String> deleteUserById(@RequestParam("id") Long _id) {
+	@PostMapping(value = "delete", params = "id")
+	public ResponseEntity<Map> deleteUserById(@RequestParam("id") Long _id) {
 		return userDataService.deleteById(_id);
 	}
 
-	@PostMapping
-	public ResponseEntity<String> deleteAllUsers() {
+	@PostMapping(value = "deleteAll")
+	public ResponseEntity<List> deleteAllUsers() {
 		return userDataService.deleteAll();
 	}
 }

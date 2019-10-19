@@ -4,6 +4,5 @@ create table usersData
 	first_name varchar(50) not null,
 	last_name varchar(50) not null,
 	birth_date date not null,
-	phone_no char(9)
-			unique,
+	phone_no char(9) unique
 );

@@ -25,6 +25,8 @@ import java.util.Map;
 @Service
 public class UploadService {
 
+	private final int PHONE_NUMBER_LENGTH = 9;
+	private final int PHONE_NUMBER_ERROR_THRESHOLD = 1;
 	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 	private UserDataRepository usersDataRepository;
 
@@ -32,7 +34,15 @@ public class UploadService {
 		this.usersDataRepository = usersDataRepository;
 	}
 
-	public ResponseEntity<UploadResponse> parseFile(MultipartFile multipartFile) {
+	/**
+	 *  Creates CsvMapper and tries to map key-value pairs
+	 *  sends map to parseData method on success
+	 *  or else returns NOT_ACCEPTABLE response
+	 *
+	 * @param multipartFile - uploaded file
+	 * @return NOT_ACCEPTABLE response or UploadResponse
+	 */
+	public ResponseEntity<UploadResponse> loadData(MultipartFile multipartFile) {
 		CsvMapper mapper = new CsvMapper();
 		CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator(';');
 		MappingIterator<Map<String, String>> data;
@@ -47,6 +57,15 @@ public class UploadService {
 		return parseData(data);
 	}
 
+	/**
+	 * Helper method for parsing data
+	 * Creates UploadResponse entity for collecting stats for individual entries
+	 * using MappingIterator sends every single row data to parseIdentity method
+	 *
+	 * @param data - MappingIterator holding all parsed data from csv file
+	 * @return uploadResponse entity wrapped by ResponseEntity class
+	 *          populated by either helper methods or this method
+	 */
 	private ResponseEntity<UploadResponse> parseData(MappingIterator<Map<String, String>> data) {
 		UploadResponse uploadResponse = new UploadResponse();
 		while (data.hasNext()) {
@@ -61,6 +80,13 @@ public class UploadService {
 		return new ResponseEntity<>(uploadResponse, HttpStatus.OK);
 	}
 
+	/**
+	 * Helper method parsing, preparing and eventually saving single entity data
+	 *
+	 * @param singleRowData  - Key-Value Map with single entry data
+	 * @param uploadResponse - uploadResponse entity created by parseData for status report
+	 */
+
 	private void parseIdentity(Map<String, String> singleRowData, UploadResponse uploadResponse) {
 		String phoneNo = phoneNoCheck(singleRowData, uploadResponse);
 		String[] names = namesCheck(singleRowData, uploadResponse);
@@ -73,7 +99,7 @@ public class UploadService {
 					.lastName(lastName)
 					.birthDate(LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyyMMdd")))
 					.build();
-			if (phoneNo != null && phoneNo.length() == 9) {
+			if (phoneNo != null && phoneNo.length() == PHONE_NUMBER_LENGTH) {
 				user.setPhoneNo(phoneNo);
 			}
 			usersDataRepository.save(user);
@@ -83,11 +109,21 @@ public class UploadService {
 		}
 	}
 
+	/**
+	 * Utility method for checking correctness of first and last name
+	 *
+	 * @param singleRowData  - Key-Value Map with single entry data
+	 * @param uploadResponse - uploadResponse entity created by parseData for status report
+	 * @return String Array of length 2, where first position is first name
+	 *          and second position last name
+	 *          Or updates uploadResponse and throws ParseError
+	 */
 	private String[] namesCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
+		int NAME_LENGTH_MIN = 2;
 		String firstName = singleRowData.getOrDefault("first_name", "");
 		String lastName = singleRowData.getOrDefault("last_name", "");
-		if (StringUtils.trimAllWhitespace(firstName).length() < 2 ||
-				StringUtils.trimAllWhitespace(lastName).length() < 2) {
+		if (StringUtils.trimAllWhitespace(firstName).length() < NAME_LENGTH_MIN ||
+				StringUtils.trimAllWhitespace(lastName).length() < NAME_LENGTH_MIN) {
 			String error = "First name or last name error";
 			uploadResponse.addToFailedWithCause(singleRowData.toString(), error);
 			throw new ParseError(error);
@@ -95,10 +131,18 @@ public class UploadService {
 		return new String[]{firstName, lastName};
 	}
 
+	/**
+	 * Utility method for checking correctness of phone number
+	 *
+	 * @param singleRowData  - Key-Value Map with single entry data
+	 * @param uploadResponse - uploadResponse entity created by parseData for status report
+	 * @return String with correct phone number or null
+	 *          Or updates uploadResponse and throws ParseError
+	 */
 	private String phoneNoCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
 		String phoneNo = singleRowData.getOrDefault("phone_no", "0");
 		phoneNo = StringUtils.trimAllWhitespace(phoneNo);
-		if (phoneNo.length() == 9) {
+		if (phoneNo.length() == PHONE_NUMBER_LENGTH) {
 			if (usersDataRepository.findByPhoneNoEquals(phoneNo) != null) {
 				String error = "Phone number already exists in database";
 				uploadResponse.addToFailedWithCause(singleRowData.toString(), error);
@@ -106,7 +150,7 @@ public class UploadService {
 			}
 			return phoneNo;
 		}
-		if (phoneNo.length() < 2) {
+		if (phoneNo.length() <= PHONE_NUMBER_ERROR_THRESHOLD) {
 			return null;
 		}
 		String error = "Error parsing phone number ";
@@ -114,25 +158,42 @@ public class UploadService {
 		throw new ParseError(error);
 	}
 
+	/**
+	 * Utility method for checking correctness of birth date
+	 *
+	 * @param singleRowData  - Key-Value Map with single entry data
+	 * @param uploadResponse - uploadResponse entity created by parseData for status report
+	 * @return String containing formatted date
+	 *          Or updates uploadResponse and throws ParseError
+	 */
 	private String dateFormatCheck(Map<String, String> singleRowData, UploadResponse uploadResponse) {
+		int YEAR_INDEX = 0;
+		int MONTH_INDEX = 1;
+		int DAY_INDEX = 2;
+		int YEAR_STRING_LENGTH = 4;
+		int BIRTHDAY_STRING_LENGTH_MIN = 7;
+		int DATE_ELEMENTS = 3;
+
 		String birthday = singleRowData.getOrDefault("birth_date", "");
-		if (birthday != null && StringUtils.trimAllWhitespace(birthday).length() > 6) {
+		if (birthday != null && StringUtils.trimAllWhitespace(birthday).length() > BIRTHDAY_STRING_LENGTH_MIN) {
 			String[] date = StringUtils.trimAllWhitespace(birthday).split("\\.");
 			StringBuilder sb = new StringBuilder();
-			if (date.length == 3 && date[0].length() == 4) {
-				sb.append(date[0]);
-				if (date[1].length() == 1) {
-					date[1] = "0" + date[1];
-				}
-				sb.append(date[1]);
-				if (date[1].length() == 1) {
-					date[2] = "0" + date[2];
-				}
-				sb.append(date[1]);
+			if (date.length == DATE_ELEMENTS && date[YEAR_INDEX].length() == YEAR_STRING_LENGTH) {
+				sb.append(date[YEAR_INDEX]);
+				sb.append(checkAndAddMissingZero(date[MONTH_INDEX]));
+				sb.append(checkAndAddMissingZero(date[DAY_INDEX]));
 				return sb.toString();
 			}
 		}
 		String error = "Error parsing birth date ";
+		uploadResponse.addToFailedWithCause(singleRowData.toString(), error);
 		throw new ParseError(error);
+	}
+
+	private String checkAndAddMissingZero(String toCheck) {
+		if (toCheck.length() ==1){
+			return "0" + toCheck;
+		}
+		return toCheck;
 	}
 }

@@ -1,5 +1,6 @@
 package com.sikoramarek.csvdemo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class UserData {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//			For sending json without ID
+//	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	Long id;
 
 	@NotNull
@@ -38,4 +41,5 @@ public class UserData {
 
 	@Column(name = "phone_no", length = 9, unique = true)
 	String phoneNo;
+
 }
