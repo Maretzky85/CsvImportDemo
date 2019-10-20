@@ -1,18 +1,22 @@
 package com.sikoramarek.csvdemo.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import net.bytebuddy.build.ToStringPlugin;
 import org.hibernate.validator.constraints.Length;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
+import org.joda.time.format.DateTimeFormatter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.Year;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,7 +41,17 @@ public class UserData {
 
 	@NotNull
 	@Column(name = "birth_date")
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	LocalDate birthDate;
+
+	public int getAge() {
+		LocalDate birthDate = getBirthDate();
+		LocalDate now = LocalDate.now();
+		return Period.between(birthDate, now).getYears();
+	}
+
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	int age;
 
 	@Column(name = "phone_no", length = 9, unique = true)
 	String phoneNo;

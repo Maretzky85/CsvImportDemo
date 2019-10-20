@@ -4,15 +4,12 @@ import com.sikoramarek.csvdemo.model.UserData;
 import com.sikoramarek.csvdemo.service.UserDataService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-
+@CrossOrigin(origins = "*")
 @RestController
 public class UserDataController {
 
@@ -47,8 +44,8 @@ public class UserDataController {
 		return userDataService.searchBySurname(search);
 	}
 
-	@PostMapping(value = "delete", params = "id")
-	public ResponseEntity<Map> deleteUserById(@RequestParam("id") Long _id) {
+	@PostMapping(value = "delete/{userId}")
+	public ResponseEntity<UserData> deleteUserById(@PathVariable("userId") Long _id) {
 		return userDataService.deleteById(_id);
 	}
 

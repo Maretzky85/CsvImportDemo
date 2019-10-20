@@ -2,10 +2,7 @@ package com.sikoramarek.csvdemo.controller;
 
 import com.sikoramarek.csvdemo.service.UploadService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +13,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class UploadController {
 

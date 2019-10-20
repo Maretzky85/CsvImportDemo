@@ -30,7 +30,8 @@ public class UploadResponse {
 	public void addToFailedWithCause(String key, String value) {
 		total++;
 		failed++;
-		failedList.put(key, value);
+		failedList.put("Input", key);
+		failedList.put("Error", value);
 	}
 
 }

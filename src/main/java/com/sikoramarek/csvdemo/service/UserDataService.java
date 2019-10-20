@@ -2,15 +2,18 @@ package com.sikoramarek.csvdemo.service;
 
 import com.sikoramarek.csvdemo.model.UserData;
 import com.sikoramarek.csvdemo.repository.UserDataRepository;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.*;
 
+@CrossOrigin(origins = "*")
 @Service
 public class UserDataService {
 
@@ -42,14 +45,14 @@ public class UserDataService {
 				.orElseGet(() -> new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK));
 	}
 
-	public ResponseEntity<Map> deleteById(Long _id) {
+	public ResponseEntity<UserData> deleteById(Long _id) {
 		if (_id >= 0){
 			Optional<UserData> user = userDataRepository.findById(_id);
-			String userData;
+			UserData userData;
 			if (user.isPresent()){
-				userData = user.get().toString();
+				userData = user.get();
 				userDataRepository.deleteById(_id);
-				return new ResponseEntity<>(Collections.singletonMap("Deleted", userData), HttpStatus.OK);
+				return new ResponseEntity<>(userData, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
